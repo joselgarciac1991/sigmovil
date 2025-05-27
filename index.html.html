@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SIGMÓVIL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FontAwesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Leaflet CSS local -->
+    <link rel="stylesheet" href="libs/leaflet.css">
+
+    <!-- Estilo propio -->
+    <link rel="stylesheet" href="sigmovil.css"/>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6d44">
+</head>
+<body>
+    <!-- Home / Menú Principal -->
+    <div class="panel active" id="panel-home">
+        <header>
+            <img src="logo-sigmovil.png" alt="SIGMÓVIL Logo"/>
+            <h1>SIGMÓVIL</h1>
+        </header>
+        <div class="main-menu">
+            <button class="menu-btn" onclick="mostrarPanel('captura')"><i class="fa fa-plus"></i> Nuevo Levantamiento</button>
+            <button class="sec-btn" onclick="mostrarPanel('historial')"><i class="fa fa-clock"></i> Historial de Datos</button>
+            <button class="sec-btn" id="btnVisorMapa"><i class="fa fa-map"></i> Visor SIG (mapa)</button>
+            <button class="sec-btn" onclick="mostrarPanel('sync')"><i class="fa fa-sync"></i> Sincronizar</button>
+            <button class="sec-btn" onclick="mostrarPanel('config')"><i class="fa fa-cog"></i> Configuración</button>
+            <button class="sec-btn" onclick="mostrarPanel('politicas')"><i class="fa fa-gavel"></i> Políticas</button>
+            <button class="sec-btn" onclick="mostrarPanel('privacidad')"><i class="fa fa-user-secret"></i> Privacidad</button>
+        </div>
+    </div>
+
+    <!-- Panel Captura de Datos -->
+    <div class="panel" id="panel-captura">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;"><i class="fa fa-arrow-left"></i></button>
+            <h1 style="display:inline;">Captura de Datos</h1>
+        </header>
+        <form class="capture-form" onsubmit="guardarPunto(event)">
+            <label>Tipo de Punto:
+                <select id="tipoPunto">
+                    <option value="Mojón">Mojón</option>
+                    <option value="Árbol">Árbol</option>
+                    <option value="Andén">Andén</option>
+                    <option value="Lindero">Lindero</option>
+                    <option value="Poste">Poste</option>
+                    <option value="Arroyo">Arroyo</option>
+                    <option value="Caño">Caño</option>
+                    <option value="Borde de vía">Borde de vía</option>
+                    <option value="Centro de vía">Centro de vía</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </label>
+            <label>Coordenadas:
+                <input type="text" id="norte" placeholder="Norte" readonly>
+                <input type="text" id="este" placeholder="Este" readonly>
+                <input type="text" id="altitud" placeholder="Altitud" readonly>
+                <button type="button" class="sec-btn" onclick="obtenerCoordenadas()">Obtener del GPS</button>
+            </label>
+            <label>Fotografía(s):
+                <input type="file" id="fotos" accept="image/*" multiple>
+            </label>
+            <button type="submit" class="menu-btn"><i class="fa fa-save"></i> Guardar Punto</button>
+        </form>
+    </div>
+
+    <!-- Panel Historial -->
+    <div class="panel" id="panel-historial">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;"><i class="fa fa-arrow-left"></i></button>
+            <h1 style="display:inline;">Historial de Puntos</h1>
+        </header>
+        <div id="listaPuntos" class="main-menu" style="gap:4px;margin-top:12px;"></div>
+        <div style="margin:20px auto;text-align:center;">
+            <button class="sec-btn" onclick="exportarTXT()"><i class="fa fa-file-alt"></i> Exportar TXT</button>
+            <button class="sec-btn" onclick="exportarGeoJSON()"><i class="fa fa-globe"></i> Exportar GeoJSON</button>
+            <button class="sec-btn" onclick="exportarKML()"><i class="fa fa-file-export"></i> Exportar KML</button>
+            <button class="sec-btn" onclick="exportarShapefile()"><i class="fa fa-database"></i> Exportar SHP</button>
+            <button class="sec-btn" onclick="exportDXF()"><i class="fa fa-draw-polygon"></i> Exportar DXF</button>
+        </div>
+    </div>
+
+    <!-- Panel Sincronizar -->
+    <div class="panel" id="panel-sync">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;"><i class="fa fa-arrow-left"></i></button>
+            <h1 style="display:inline;">Sincronizar</h1>
+        </header>
+        <div style="margin:30px auto;text-align:center;">
+            <button class="menu-btn" onclick="sincronizar()"><i class="fa fa-sync"></i> Sincronizar con la Web</button>
+        </div>
+    </div>
+
+    <!-- Panel Configuración -->
+    <div class="panel" id="panel-config">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;"><i class="fa fa-arrow-left"></i></button>
+            <h1 style="display:inline;">Configuración</h1>
+        </header>
+        <div style="margin:28px auto;text-align:center;">
+            <p>Puedes personalizar colores y exportar tu base de datos próximamente.</p>
+        </div>
+    </div>
+
+    <!-- Panel Políticas -->
+    <div class="panel" id="panel-politicas">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 style="display:inline;">Políticas y Términos</h1>
+        </header>
+        <div id="contenido-politicas" style="padding:18px;"></div>
+    </div>
+
+    <!-- Panel Privacidad -->
+    <div class="panel" id="panel-privacidad">
+        <header>
+            <button onclick="mostrarPanel('home')" style="background:none;border:none;font-size:1.5em;color:#4a6d44;">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h1 style="display:inline;">Política de Privacidad</h1>
+        </header>
+        <div id="contenido-privacidad" style="padding:18px;"></div>
+    </div>
+
+    <!-- Modal visor SIG (mapa) -->
+    <div id="modalMapa" class="modal">
+      <div class="modal-content" style="max-width:500px;min-width:260px;padding:0;overflow:hidden;">
+        <span class="close" id="cerrarMapa">&times;</span>
+        <h3 style="margin:16px 0 0 0;padding:0 18px 0 18px;text-align:center;color:#4a6d44">Mapa de puntos guardados</h3>
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 18px 0 18px;">
+          <select id="filtroTipo" style="flex:1;padding:4px 8px;border-radius:8px;">
+            <option value="">Todos los tipos</option>
+            <option value="Árbol">Árbol</option>
+            <option value="Mojón">Mojón</option>
+            <option value="Andén">Andén</option>
+            <option value="Lindero">Lindero</option>
+            <option value="Poste">Poste</option>
+            <option value="Arroyo">Arroyo</option>
+            <option value="Caño">Caño</option>
+            <option value="Borde de vía">Borde de vía</option>
+            <option value="Centro de vía">Centro de vía</option>
+            <option value="Casa">Casa</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <button class="map-btn" title="Exportar a KML" onclick="exportarKML(puntosFiltrados)">
+            <i class="fa fa-file-export"></i>
+          </button>
+          <button class="map-btn" title="Exportar a GeoJSON" onclick="exportarGeoJSON(puntosFiltrados)">
+            <i class="fa fa-code"></i>
+          </button>
+        </div>
+        <div id="mapaHistorial" style="width:100%;height:360px;margin:10px 0 0 0;"></div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS: Librerías locales y tu código -->
+    <script src="libs/leaflet.js"></script>
+    <script src="libs/shpwrite.js"></script>
+    <script src="libs/dxf.min.js"></script>
+
+    <!-- Panel navigation, carga de políticas y privacidad -->
+    <script>
+    function mostrarPanel(nombre) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + nombre).classList.add('active');
+        // Cargar contenido externo solo si es necesario
+        if (nombre === 'politicas') cargarContenidoHTML('sigmovil/politicas.html', 'contenido-politicas');
+        if (nombre === 'privacidad') cargarContenidoHTML('sigmovil/privacidad.html', 'contenido-privacidad');
+        // Si abres historial, refresca lista de puntos
+        if (nombre === 'historial') refrescarHistorial();
+    }
+    function cargarContenidoHTML(ruta, contenedorId) {
+        fetch(ruta).then(resp => resp.text())
+        .then(html => {
+            document.getElementById(contenedorId).innerHTML = html;
+        })
+        .catch(e => {
+            document.getElementById(contenedorId).innerHTML = '<i>No se pudo cargar el contenido.</i>';
+        });
+    }
+    </script>
+    <!-- Tu código principal (debe ir después de cargar las librerías) -->
+    <script src="sigmovil.js"></script>
+</body>
+</html>

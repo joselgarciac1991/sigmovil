@@ -1,0 +1,42 @@
+{
+  "name": "SIGMÓVIL",
+  "short_name": "SIGMÓVIL",
+  "description": "Aplicación para la recolección eficiente de datos topográficos en campo.",
+  "lang": "es-CO",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f8ec",
+  "theme_color": "#4a6d44",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo Levantamiento",
+      "short_name": "Nuevo",
+      "description": "Registrar nuevo punto de levantamiento",
+      "url": "./index.html#captura",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Historial de Puntos",
+      "short_name": "Historial",
+      "description": "Ver historial de datos",
+      "url": "./index.html#historial",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
